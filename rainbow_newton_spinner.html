@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rainbow Newton Spinner</title>
+<style>
+  body{margin:0;background:#111;color:#fff;font-family:system-ui,sans-serif;text-align:center;padding:18px}
+  h2{margin:4px 0 8px;font-size:22px}
+  p{margin:0 0 12px;opacity:.8}
+  canvas{width:min(88vw,360px);height:min(88vw,360px);touch-action:none;display:block;margin:10px auto}
+  button{font-size:18px;padding:10px 18px;border:0;border-radius:12px;margin:5px;cursor:pointer}
+  input{width:min(80vw,320px)}
+  .note{font-size:13px;opacity:.65;margin-top:10px}
+</style>
+</head>
+<body>
+<h2>🌈 Rainbow / Newton Spinner</h2>
+<p>Spin दबाएँ — तेज़ rotation पर रंग blend होते दिखेंगे।</p>
+<canvas id="c" width="600" height="600"></canvas>
+<div>
+  <button id="spin">▶ Spin</button>
+  <button id="stop">⏸ Stop</button>
+</div>
+<div>Speed: <input id="speed" type="range" min="1" max="40" value="18"></div>
+<div class="note">यह visual simulation है; असली physical disc की तरह exact white guaranteed नहीं है।</div>
+<script>
+const c=document.getElementById('c'),x=c.getContext('2d');
+const colors=['#e60000','#ff7a00','#ffd400','#19b719','#008cff','#2440d8','#8a18c9'];
+let a=0, v=.12, running=false, last=0;
+function draw(){
+  const cx=300,cy=300,r=270;
+  x.clearRect(0,0,600,600);
+  x.save(); x.translate(cx,cy); x.rotate(a);
+  for(let i=0;i<7;i++){
+    x.beginPath(); x.moveTo(0,0);
+    x.arc(0,0,r,i*2*Math.PI/7,(i+1)*2*Math.PI/7);
+    x.closePath(); x.fillStyle=colors[i]; x.fill();
+  }
+  x.beginPath(); x.arc(0,0,r,0,Math.PI*2); x.lineWidth=8; x.strokeStyle='#ddd'; x.stroke();
+  x.beginPath(); x.arc(0,0,45,0,Math.PI*2); x.fillStyle='#d7a84a'; x.fill();
+  x.beginPath(); x.arc(0,0,12,0,Math.PI*2); x.fillStyle='#222'; x.fill();
+  x.restore();
+}
+function frame(t){
+  if(!last) last=t;
+  const dt=Math.min(40,t-last); last=t;
+  if(running) a += v*dt;
+  draw(); requestAnimationFrame(frame);
+}
+document.getElementById('spin').onclick=()=>{running=true;v=.01*Number(document.getElementById('speed').value)};
+document.getElementById('stop').onclick=()=>running=false;
+document.getElementById('speed').oninput=e=>v=.01*Number(e.target.value);
+draw(); requestAnimationFrame(frame);
+</script>
+</body>
+</html>
