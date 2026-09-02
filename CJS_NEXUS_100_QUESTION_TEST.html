@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CJS NEXUS — 100 प्रश्न ऑनलाइन टेस्ट</title>
+<style>
+:root{--bg:#07111f;--card:#0d1b2d;--card2:#10243b;--line:#214664;--text:#eef7ff;--muted:#a8c0d4;--accent:#18bfff;--accent2:#7c4dff;--good:#22c55e;--bad:#ef4444}
+*{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at top,#102a44 0,#07111f 45%,#030810 100%);color:var(--text);font-family:"Noto Sans Devanagari","Mangal",system-ui,sans-serif}
+.container{max-width:1000px;margin:auto;padding:18px}.hero{background:linear-gradient(135deg,#102b45,#0a1727);border:1px solid var(--line);border-radius:20px;padding:22px;box-shadow:0 15px 45px #0008;position:sticky;top:0;z-index:10;backdrop-filter:blur(12px)}
+h1{margin:0 0 6px;text-align:center;font-size:30px;color:#62d7ff;letter-spacing:.5px}.sub{text-align:center;color:var(--muted);margin-bottom:14px}.info{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}.pill{padding:8px 13px;border:1px solid var(--line);border-radius:999px;background:#071321;color:#d9efff}.timer{font-weight:800;color:#fff;background:linear-gradient(90deg,#126b99,#5b35c8);border-color:#55d6ff}.timer.warning{background:#8b1d2c}.progress{margin-top:12px;height:8px;background:#06101c;border-radius:99px;overflow:hidden}.bar{height:100%;width:0;background:linear-gradient(90deg,#18bfff,#7c4dff);transition:.2s}
+.section{margin:22px 0 12px;padding:12px 16px;border-radius:14px;background:linear-gradient(90deg,#112b44,#0c1c2e);border:1px solid var(--line);font-size:21px;font-weight:800;color:#7edfff}.question{background:#0b1929;border:1px solid #1b3a55;border-radius:15px;padding:17px;margin:12px 0;box-shadow:0 7px 20px #0004}.qtitle{font-size:17px;line-height:1.55;margin-bottom:12px}.num{color:#6edcff;font-weight:800}.options{display:grid;grid-template-columns:1fr 1fr;gap:9px}.opt{display:block;border:1px solid #284b65;border-radius:11px;padding:11px 12px;cursor:pointer;background:#0c2134;transition:.15s}.opt:hover{border-color:#55d6ff;background:#102d46}.opt input{margin-right:8px;accent-color:#18bfff}.opt.selected{border-color:#18bfff;box-shadow:0 0 0 1px #18bfff44 inset;background:#10314a}
+.submitWrap{text-align:center;padding:25px}.submit{border:0;border-radius:14px;padding:15px 35px;font-size:20px;font-weight:900;color:white;background:linear-gradient(90deg,#087ec1,#6638d7);box-shadow:0 10px 30px #087ec155;cursor:pointer}.submit:active{transform:scale(.98)}
+#result{display:none;margin-top:25px}.resultCard{background:#0c1b2b;border:1px solid var(--line);border-radius:18px;padding:20px}.score{font-size:48px;font-weight:900;text-align:center;color:#6ee7ff}.grade{text-align:center;font-size:22px;font-weight:800;margin-bottom:18px}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.stat{background:#091625;border:1px solid #1e3c54;border-radius:12px;padding:12px;text-align:center}.stat b{display:block;font-size:20px;color:#fff}.review{margin-top:20px}.reviewItem{padding:14px;margin:9px 0;border-radius:12px;border:1px solid #25475f;background:#091624}.reviewItem.correct{border-color:#1c7a48}.reviewItem.wrong{border-color:#8b3340}.answer{margin-top:7px;color:#7de6a6}.your{color:#ffcaca}.restart{display:block;margin:18px auto 0;background:#142b40;border:1px solid #2c5672;color:white;padding:11px 20px;border-radius:10px;cursor:pointer}
+@media(max-width:700px){.options{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}h1{font-size:24px}.hero{position:relative}}
+</style>
+</head>
+<body>
+<div class="container">
+<header class="hero">
+<h1>⚡ CJS NEXUS — 100 प्रश्न ऑनलाइन टेस्ट</h1>
+<div class="sub">हिंदी माध्यम • 100 अंक • प्रत्येक प्रश्न 1 अंक • कोई नकारात्मक अंक नहीं</div>
+<div class="info"><span class="pill">➗ गणित: 20</span><span class="pill">🧠 रीजनिंग: 20</span><span class="pill">🌍 सामान्य ज्ञान: 20</span><span class="pill">🔬 विज्ञान: 20</span><span class="pill">📰 करेंट अफेयर्स: 20</span><span id="timer" class="pill timer">⏱️ 90:00</span></div>
+<div class="progress"><div id="bar" class="bar"></div></div>
+</header>
+<form id="quiz"></form>
+<div class="submitWrap"><button type="button" class="submit" onclick="submitTest(false)">SUBMIT TEST ✓</button></div>
+<div id="result"></div>
+</div>
+<script>
+const sections=[
+{title:'➗ गणित — 20 प्रश्न', qs:[
+['एक संख्या का 25% = 60 है। वह संख्या क्या है?',['180','200','240','260'],2],
+['यदि 3x + 7 = 28, तो x का मान क्या है?',['5','6','7','8'],1],
+['12, 18 और 24 का HCF क्या है?',['3','6','9','12'],1],
+['15 और 20 का LCM क्या है?',['40','50','60','80'],2],
+['एक वस्तु का अंकित मूल्य ₹800 है और 10% छूट दी गई। विक्रय मूल्य क्या होगा?',['₹700','₹720','₹740','₹760'],1],
+['₹5000 पर 8% वार्षिक साधारण ब्याज की दर से 2 वर्ष का ब्याज कितना होगा?',['₹600','₹700','₹800','₹900'],2],
+['एक आयत की लंबाई 15 सेमी और चौड़ाई 8 सेमी है। क्षेत्रफल क्या है?',['100 सेमी²','120 सेमी²','140 सेमी²','160 सेमी²'],1],
+['एक वर्ग की भुजा 9 सेमी है। उसका परिमाप क्या होगा?',['18 सेमी','27 सेमी','36 सेमी','81 सेमी'],2],
+['एक ट्रेन 60 किमी/घंटा की गति से 3 घंटे चलती है। दूरी कितनी होगी?',['120 किमी','150 किमी','180 किमी','200 किमी'],2],
+['2/3 + 1/6 = ?',['1/2','2/3','5/6','1'],2],
+['यदि किसी संख्या का 40% = 72 है, तो संख्या क्या है?',['160','170','180','190'],2],
+['अनुपात 3:5 में पहली संख्या 27 है। दूसरी संख्या क्या है?',['35','40','45','50'],2],
+['एक दुकानदार ₹400 की वस्तु पर 15% लाभ कमाता है। विक्रय मूल्य क्या है?',['₹440','₹450','₹460','₹480'],2],
+['7² − 5² का मान क्या है?',['12','24','36','48'],1],
+['औसत 10, 20, 30, 40 और 50 का क्या है?',['25','30','35','40'],1],
+['एक वृत्त की त्रिज्या 7 सेमी है। π = 22/7 लेने पर क्षेत्रफल क्या होगा?',['44 सेमी²','88 सेमी²','154 सेमी²','308 सेमी²'],2],
+['यदि x:y = 4:7 और x = 20 है, तो y कितना है?',['28','30','35','40'],2],
+['एक संख्या में 20% वृद्धि करने पर 360 प्राप्त होता है। मूल संख्या क्या थी?',['280','300','320','340'],1],
+['5 मजदूर कोई काम 12 दिनों में करते हैं। समान गति से 10 मजदूर वही काम कितने दिनों में करेंगे?',['4','5','6','8'],2],
+['एक सिक्का एक बार उछाला जाता है। चित आने की प्रायिकता क्या है?',['0','1/4','1/2','1'],2]
+]},
+{title:'🧠 रीजनिंग — 20 प्रश्न', qs:[
+['श्रृंखला पूरी करें: 2, 4, 8, 16, ?',['24','30','32','36'],2],
+['श्रृंखला पूरी करें: 3, 6, 11, 18, 27, ?',['36','38','40','42'],1],
+['यदि CAT को DBU लिखा जाए, तो DOG को क्या लिखा जाएगा?',['EPH','EOG','FPH','DPG'],0],
+['विषम चुनिए:',['सेब','आम','केला','गाजर'],3],
+['A, B का भाई है और B, C की बहन है। A का C से क्या संबंध हो सकता है?',['भाई','बहन','माता','पिता'],0],
+['यदि आज सोमवार है, तो 45 दिन बाद कौन-सा दिन होगा?',['बुधवार','गुरुवार','शुक्रवार','शनिवार'],1],
+['एक पंक्ति में राहुल बाएँ से 12वें और दाएँ से 18वें स्थान पर है। कुल कितने व्यक्ति हैं?',['28','29','30','31'],1],
+['यदि सभी गुलाब फूल हैं और कुछ फूल लाल हैं, तो कौन-सा निष्कर्ष निश्चित है?',['सभी गुलाब लाल हैं','कुछ गुलाब लाल हैं','सभी गुलाब फूल हैं','कोई गुलाब फूल नहीं'],2],
+['दर्पण में घड़ी का समय 3:00 दिख रहा है। वास्तविक समय क्या होगा?',['3:00','6:00','9:00','12:00'],2],
+['एक व्यक्ति उत्तर की ओर 10 मीटर चलता है, फिर दाएँ 10 मीटर। वह प्रारंभिक स्थान से किस दिशा में है?',['उत्तर-पूर्व','उत्तर-पश्चिम','दक्षिण-पूर्व','दक्षिण-पश्चिम'],0],
+['अक्षर श्रृंखला: A, C, F, J, O, ?',['T','U','V','W'],1],
+['यदि PEN = 35 (अक्षरों के स्थानों का योग), तो CAT = ?',['24','25','26','27'],1],
+['विषम संख्या चुनिए:',['16','25','36','45'],3],
+['कथन: सभी विद्यार्थी पाठक हैं। कुछ पाठक खिलाड़ी हैं। निष्कर्ष:',['सभी विद्यार्थी खिलाड़ी हैं','कुछ विद्यार्थी खिलाड़ी हैं','सभी विद्यार्थी पाठक हैं','कोई पाठक खिलाड़ी नहीं'],2],
+['एक परिवार में पिता, माता, दो बेटे और एक बेटी हैं। कुल सदस्य कितने हैं?',['4','5','6','7'],1],
+['यदि SOUTH को TPVUI लिखा जाए, तो NORTH कैसे लिखा जाएगा?',['OPSUI','OPSUH','NPSUI','OPRUI'],0],
+['एक घन के कितने फलक होते हैं?',['4','6','8','12'],1],
+['5 बच्चों में मोहन की ऊँचाई तीसरे स्थान पर है। उससे छोटे कितने बच्चे हो सकते हैं?',['1','2','3','4'],1],
+['यदि 1 जनवरी शुक्रवार है, तो उसी सामान्य वर्ष में 8 जनवरी कौन-सा दिन होगा?',['गुरुवार','शुक्रवार','शनिवार','रविवार'],1],
+['घड़ी में 12 बजे घंटे और मिनट की सुई के बीच कोण कितना होता है?',['0°','30°','90°','180°'],0]
+]},
+{title:'🌍 सामान्य ज्ञान — 20 प्रश्न', qs:[
+['भारत का संविधान कब लागू हुआ?',['15 अगस्त 1947','26 नवंबर 1949','26 जनवरी 1950','2 अक्टूबर 1950'],2],
+['भारत की राजधानी क्या है?',['मुंबई','नई दिल्ली','कोलकाता','चेन्नई'],1],
+['भारत का राष्ट्रीय पशु कौन है?',['सिंह','बाघ','हाथी','मोर'],1],
+['भारतीय संविधान की प्रस्तावना में कितने मुख्य आदर्श बताए गए हैं— संप्रभु, समाजवादी, पंथनिरपेक्ष, लोकतांत्रिक और...?',['गणराज्य','न्याय','स्वतंत्रता','समानता'],0],
+['लोकसभा का सामान्य कार्यकाल कितने वर्ष का होता है?',['4','5','6','7'],1],
+['राज्यसभा का पदेन सभापति कौन होता है?',['राष्ट्रपति','प्रधानमंत्री','उपराष्ट्रपति','लोकसभा अध्यक्ष'],2],
+['भारत का सर्वोच्च न्यायालय कहाँ स्थित है?',['मुंबई','नई दिल्ली','प्रयागराज','लखनऊ'],1],
+['सांची स्तूप किस राज्य में है?',['मध्य प्रदेश','बिहार','राजस्थान','ओडिशा'],0],
+['नालंदा विश्वविद्यालय का प्राचीन केंद्र वर्तमान में किस राज्य में है?',['बिहार','झारखंड','उत्तर प्रदेश','पश्चिम बंगाल'],0],
+['भारत में हरित क्रांति से किस फसल के उत्पादन में विशेष वृद्धि हुई?',['गेहूँ','चाय','कॉफी','जूट'],0],
+['भारतीय रिज़र्व बैंक की स्थापना किस वर्ष हुई?',['1930','1935','1940','1947'],1],
+['भारत का सबसे बड़ा राज्य क्षेत्रफल की दृष्टि से कौन-सा है?',['मध्य प्रदेश','महाराष्ट्र','राजस्थान','उत्तर प्रदेश'],2],
+['गंगा नदी का उद्गम किस हिमनद से माना जाता है?',['सियाचिन','गंगोत्री','पिंडारी','जेमू'],1],
+['कर्क रेखा भारत के कितने राज्यों से होकर गुजरती है?',['6','7','8','9'],2],
+['भारतीय राष्ट्रीय कांग्रेस की स्थापना किस वर्ष हुई?',['1885','1890','1905','1911'],0],
+['भारत का राष्ट्रीय गीत कौन-सा है?',['जन गण मन','वंदे मातरम्','सारे जहाँ से अच्छा','ऐ मेरे वतन'],1],
+['पंचायती राज व्यवस्था को संवैधानिक दर्जा किस संशोधन से मिला?',['42वाँ','61वाँ','73वाँ','74वाँ'],2],
+['मौलिक कर्तव्य संविधान के किस भाग में हैं?',['भाग III','भाग IV','भाग IVA','भाग V'],2],
+['भारत की पहली महिला राज्यपाल कौन थीं?',['सरोजिनी नायडू','सुचेता कृपलानी','विजयलक्ष्मी पंडित','इंदिरा गांधी'],0],
+['UNESCO का मुख्यालय किस शहर में है?',['लंदन','पेरिस','रोम','जेनेवा'],1]
+]},
+{title:'🔬 विज्ञान — 20 प्रश्न', qs:[
+['जल का रासायनिक सूत्र क्या है?',['CO₂','H₂O','O₂','NaCl'],1],
+['प्रकाश की गति निर्वात में लगभग कितनी है?',['3×10⁶ m/s','3×10⁷ m/s','3×10⁸ m/s','3×10⁹ m/s'],2],
+['मानव शरीर में रक्त को पंप करने वाला अंग कौन-सा है?',['फेफड़ा','हृदय','यकृत','गुर्दा'],1],
+['पौधों में प्रकाश संश्लेषण मुख्यतः किस अंगक में होता है?',['नाभिक','माइटोकॉन्ड्रिया','क्लोरोप्लास्ट','राइबोसोम'],2],
+['बल की SI इकाई क्या है?',['जूल','वाट','न्यूटन','पास्कल'],2],
+['विद्युत धारा की SI इकाई क्या है?',['वोल्ट','एम्पियर','ओम','कूलॉम'],1],
+['विटामिन C की कमी से कौन-सा रोग होता है?',['रिकेट्स','स्कर्वी','रातांधता','बेरी-बेरी'],1],
+['मानव शरीर का सामान्य तापमान लगभग कितना माना जाता है?',['35°C','37°C','39°C','41°C'],1],
+['ध्वनि निर्वात में कैसी यात्रा करती है?',['तेजी से','धीरे','नहीं कर सकती','प्रकाश में बदल जाती है'],2],
+['ओजोन का रासायनिक सूत्र क्या है?',['O','O₂','O₃','CO₃'],2],
+['अम्ल का pH सामान्यतः कैसा होता है?',['7 से कम','7','7 से अधिक','हमेशा 14'],0],
+['मानव शरीर में ऑक्सीजन का परिवहन मुख्यतः किसके द्वारा होता है?',['प्लाज्मा में ग्लूकोज','हीमोग्लोबिन','प्लेटलेट','पित्त'],1],
+['न्यूटन का प्रथम नियम किससे संबंधित है?',['जड़त्व','ऊष्मा','विद्युत आवेश','अपवर्तन'],0],
+['लोहे पर जंग लगना किस प्रकार की प्रक्रिया है?',['अपचयन','ऑक्सीकरण','उर्ध्वपातन','आसवन'],1],
+['DNA का पूरा नाम क्या है?',['डाइऑक्सी न्यूक्लिक एसिड','डीऑक्सीराइबोन्यूक्लिक अम्ल','डाइ-नाइट्रोजन अम्ल','डबल न्यूक्लियर एसिड'],1],
+['सूर्य में ऊर्जा मुख्यतः किस प्रक्रिया से उत्पन्न होती है?',['दहन','नाभिकीय संलयन','नाभिकीय विखंडन','वाष्पीकरण'],1],
+['पानी का क्वथनांक समुद्र तल पर लगभग कितना है?',['50°C','75°C','100°C','125°C'],2],
+['विद्युत प्रतिरोध की SI इकाई क्या है?',['ओम','वोल्ट','एम्पियर','फैरड'],0],
+['मनुष्य में इंसुलिन किस अंग से स्रावित होता है?',['यकृत','अग्न्याशय','थायरॉयड','फेफड़े'],1],
+['पृथ्वी का प्राकृतिक उपग्रह कौन है?',['मंगल','चंद्रमा','शुक्र','बुध'],1]
+]},
+{title:'📰 करेंट अफेयर्स — अगस्त/सितंबर 2026 तक — 20 प्रश्न', qs:[
+['अगस्त 2026 में प्रधानमंत्री नरेंद्र मोदी ने किस देश की राजकीय यात्रा की?',['उज़्बेकिस्तान और किर्गिज़ गणराज्य','जापान और दक्षिण कोरिया','फ्रांस और जर्मनी','नेपाल और भूटान'],0],
+['30 अगस्त 2026 को उज़्बेकिस्तान ने प्रधानमंत्री नरेंद्र मोदी को कौन-सा सर्वोच्च विदेशी सम्मान प्रदान किया?',['Order of the Nile','Oliy Darajali Do’stlik','Order of Merit','Legion of Honour'],1],
+['31 अगस्त 2026 को प्रधानमंत्री ने किस देश के राष्ट्रपति से SCO शिखर सम्मेलन के दौरान मुलाकात की?',['ईरान','कनाडा','ऑस्ट्रेलिया','ब्राज़ील'],0],
+['15 अगस्त 2026 को भारत ने कौन-सा स्वतंत्रता दिवस मनाया?',['78वाँ','79वाँ','80वाँ','81वाँ'],2],
+['15 अगस्त 2026 के भाषण में प्रधानमंत्री ने एक वर्ष में कितने युवाओं को AI में कौशल देने की घोषणा की?',['10 लाख','50 लाख','1 करोड़','5 करोड़'],2],
+['अगस्त 2026 में भारत के किस फसल/क्षेत्र को PIB ने “Traditional Crop to Global Superfood” के रूप में रेखांकित किया?',['मखाना','कपास','गेहूँ','चाय'],0],
+['29 अगस्त 2026 को भारत में कौन-सा दिवस मनाया गया?',['राष्ट्रीय विज्ञान दिवस','राष्ट्रीय खेल दिवस','राष्ट्रीय किसान दिवस','राष्ट्रीय युवा दिवस'],1],
+['अगस्त 2026 में भारत सरकार ने किस योजना पर पृष्ठभूमि सामग्री जारी की, जो यात्री आरक्षण में डिजिटल बदलाव से संबंधित है?',['रेलवे यात्री आरक्षण','उज्ज्वला योजना','जनधन योजना','फसल बीमा योजना'],0],
+['29 अगस्त 2026 की PIB सामग्री में किस योजना के 12 वर्ष पूरे होने का उल्लेख था?',['प्रधानमंत्री जन धन योजना','आयुष्मान भारत','उज्ज्वला योजना','मनरेगा'],0],
+['28 अगस्त 2026 को PIB की पृष्ठभूमि सामग्री में किस विषय पर प्रकाश डाला गया?',['भारत में परमाणु ऊर्जा प्रौद्योगिकी','समुद्री डाक सेवा','वन्यजीव जनगणना','कृषि निर्यात'],0],
+['अगस्त 2026 में “World Elephant Day” किस तारीख को मनाया गया?',['8 अगस्त','10 अगस्त','12 अगस्त','15 अगस्त'],2],
+['6 अगस्त 2026 की PIB पृष्ठभूमि सामग्री में GOBARdhan को किससे जोड़ा गया?',['स्वच्छ ऊर्जा और ग्रामीण विकास','अंतरिक्ष अनुसंधान','समुद्री सुरक्षा','खेल प्रशिक्षण'],0],
+['5 अगस्त 2026 की PIB सामग्री में भारत के किस क्षेत्र के उभार पर प्रकाश डाला गया?',['इलेक्ट्रिक वाहन पारिस्थितिकी तंत्र','हीरा उद्योग','कागज उद्योग','रेशम उद्योग'],0],
+['3 अगस्त 2026 को PIB ने “Samudra Manthan” को किससे जोड़ा?',['राष्ट्रीय अपतटीय अन्वेषण योजना','राष्ट्रीय शिक्षा नीति','डिजिटल भुगतान','स्वास्थ्य बीमा'],0],
+['1 अगस्त 2026 की PIB पृष्ठभूमि सामग्री में किस रोजगार योजना का उल्लेख था?',['प्रधानमंत्री विकसित भारत रोजगार योजना','प्रधानमंत्री आवास योजना','प्रधानमंत्री फसल बीमा योजना','राष्ट्रीय स्वास्थ्य मिशन'],0],
+['31 अगस्त 2026 की IMD संबंधी रिपोर्ट के अनुसार सितंबर 2026 की वर्षा कैसी रहने की आशंका जताई गई?',['सामान्य से बहुत अधिक','सामान्य से कम','सामान्य के बराबर','पूरी तरह शून्य'],1],
+['Reuters की 31 अगस्त 2026 की रिपोर्ट के अनुसार अगस्त 2026 में भारत की वर्षा सामान्य से लगभग कितनी कम रही?',['6%','10%','16%','25%'],2],
+['सितंबर 2026 में कम वर्षा की स्थिति को रिपोर्ट में किस जलवायु घटना के मजबूत होने से जोड़ा गया?',['ला नीना','एल नीनो','ध्रुवीय भंवर','मानसून ब्रेक'],1],
+['अगस्त 2026 में प्रधानमंत्री ने किस पूर्व राष्ट्रपति की आत्मकथा जारी की?',['राम नाथ कोविंद','ए.पी.जे. अब्दुल कलाम','प्रतिभा पाटिल','प्रणब मुखर्जी'],0],
+['27 अगस्त 2026 को प्रधानमंत्री किस कार्यक्रम में वीडियो कॉन्फ्रेंसिंग के माध्यम से शामिल हुए?',['Khelo India Dialogue','Viksit Bharat Expo','India Energy Summit','Youth Parliament'],0]
+]}
+];
+
+let all=[];let qno=0;sections.forEach((s,si)=>{s.qs.forEach(q=>{all.push({section:s.title,subject:s.title.split('—')[0].trim(),q:q[0],opts:q[1],ans:q[2],no:++qno});});});
+const quiz=document.getElementById('quiz');
+let html='';let currentSubject='';
+all.forEach((q,i)=>{
+ if(q.section!==currentSubject){html+=`<div class="section">${q.section}</div>`;currentSubject=q.section;}
+ html+=`<div class="question" id="q${i}"><div class="qtitle"><span class="num">प्रश्न ${i+1}.</span> ${q.q}</div><div class="options">`;
+ q.opts.forEach((o,j)=>{html+=`<label class="opt"><input type="radio" name="q${i}" value="${j}" onchange="pick(${i})"> <b>${String.fromCharCode(65+j)}.</b> ${o}</label>`;});
+ html+='</div></div>';
+});quiz.innerHTML=html;
+function pick(i){document.querySelectorAll(`#q${i} .opt`).forEach(x=>x.classList.remove('selected'));const c=document.querySelector(`#q${i} input:checked`);if(c)c.parentElement.classList.add('selected');updateProgress();}
+function updateProgress(){const answered=document.querySelectorAll('input[type=radio]:checked').length;document.getElementById('bar').style.width=(answered/100*100)+'%';}
+let remaining=90*60;let submitted=false;
+function tick(){if(submitted)return;let m=Math.floor(remaining/60),s=remaining%60;const t=document.getElementById('timer');t.textContent=`⏱️ ${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;if(remaining<=300)t.classList.add('warning');if(remaining<=0){submitTest(true);return;}remaining--;}
+setInterval(tick,1000);tick();
+function grade(p){if(p>=90)return'A+';if(p>=80)return'A';if(p>=70)return'B+';if(p>=60)return'B';if(p>=50)return'C';if(p>=40)return'D';return'F';}
+function submitTest(auto){if(submitted)return;const unanswered=100-document.querySelectorAll('input[type=radio]:checked').length;if(!auto&&unanswered>0){if(!confirm(`आपने ${unanswered} प्रश्नों का उत्तर नहीं दिया है। क्या फिर भी SUBMIT करना चाहते हैं?`))return;}submitted=true;document.querySelectorAll('input').forEach(x=>x.disabled=true);document.querySelector('.submit').disabled=true;
+ let score=0;const sub={};all.forEach((q,i)=>{const key=q.subject;sub[key]??={score:0,total:0};sub[key].total++;const c=document.querySelector(`input[name=q${i}]:checked`);if(c&&Number(c.value)===q.ans){score++;sub[key].score++;}});
+ const pct=score;let review='';all.forEach((q,i)=>{const c=document.querySelector(`input[name=q${i}]:checked`);const u=c?Number(c.value):-1;const ok=u===q.ans;review+=`<div class="reviewItem ${ok?'correct':'wrong'}"><b>प्रश्न ${i+1}.</b> ${q.q}<br><span class="answer">✓ सही उत्तर: ${String.fromCharCode(65+q.ans)}. ${q.opts[q.ans]}</span>${u<0?'<br><span class="your">आपका उत्तर: नहीं दिया</span>':(!ok?`<br><span class="your">आपका उत्तर: ${String.fromCharCode(65+u)}. ${q.opts[u]}</span>`:'<br><span style="color:#7de6a6">आपका उत्तर: सही ✓</span>')}</div>`;});
+ let stats='';Object.entries(sub).forEach(([k,v])=>{stats+=`<div class="stat"><b>${v.score}/${v.total}</b>${k}</div>`});
+ const r=document.getElementById('result');r.style.display='block';r.innerHTML=`<div class="resultCard"><div class="score">${score}/100</div><div class="grade">${pct}% &nbsp; • &nbsp; Grade: ${grade(pct)}</div><div class="stats">${stats}</div><div class="review"><h2>📋 सभी प्रश्नों के सही उत्तर</h2>${review}</div><button class="restart" onclick="location.reload()">↻ फिर से टेस्ट दें</button></div>`;r.scrollIntoView({behavior:'smooth'});
+}
+</script>
+</body></html>
